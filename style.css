@@ -7,7 +7,7 @@ body{
 
 @media (prefers-color-scheme: light) {
     body {
-        color:#ccc;
+        color:#2d2d2d;
         background:white }
     a:link {
         color:#5bf }
