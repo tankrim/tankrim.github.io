@@ -1,8 +1,7 @@
-@media (prefers-color-scheme: light) {
-    body {
-        color:black;
-        background:white
-    }
+body {
+    color:black;
+    background:white
+}
 
 @media (prefers-color-scheme: dark) {
     body {
