@@ -1,11 +1,11 @@
 @media (prefers-color-scheme: light) {
     body {
         color:black;
-        background:#ccc
+        background:white
     }
 
 @media (prefers-color-scheme: dark) {
     body {
-        color:#ccc;
+        color:white;
         background:black
     }
