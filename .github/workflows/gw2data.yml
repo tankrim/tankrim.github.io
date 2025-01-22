@@ -13,41 +13,35 @@ jobs:
       
       # Fetch account data
       - name: Fetch Account Data
-        uses: JamesIves/fetch-api-data-action@v2
-        with:
-          endpoint: https://api.guildwars2.com/v2/account?&v=2025-01-01T01:00:00.000Z
-          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
-          save-name: account.json
-          
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.GW2_API_TOKEN }}" \
+            "https://api.guildwars2.com/v2/account?&v=2025-01-01T01:00:00.000Z" \
+            -o account.json
+
       # Fetch achievements data
       - name: Fetch Achievements Data
-        uses: JamesIves/fetch-api-data-action@v2
-        with:
-          endpoint: https://api.guildwars2.com/v2/account/achievements
-          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
-          save-name: achievements.json
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.GW2_API_TOKEN }}" \
+            "https://api.guildwars2.com/v2/account/achievements" \
+            -o achievements.json
 
       # Fetch wallet data
       - name: Fetch Wallet Data
-        uses: JamesIves/fetch-api-data-action@v2
-        with:
-          endpoint: https://api.guildwars2.com/v2/account/wallet
-          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
-          save-name: wallet.json
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.GW2_API_TOKEN }}" \
+            "https://api.guildwars2.com/v2/account/wallet" \
+            -o wallet.json
 
       # Fetch materials data
       - name: Fetch Materials Data
-        uses: JamesIves/fetch-api-data-action@v2
-        with:
-          endpoint: https://api.guildwars2.com/v2/account/materials
-          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
-          save-name: materials.json
-
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.GW2_API_TOKEN }}" \
+            "https://api.guildwars2.com/v2/account/materials" \
+            -o materials.json
           
       # Process and combine the data
       - name: Process JSON Data
         run: |
-          # Create combined stats in a single jq operation
           jq -n \
             --slurpfile account account.json \
             --slurpfile achievements achievements.json \
@@ -67,8 +61,7 @@ jobs:
               "powerful_venom_sac": ($materials[0][] | select(.id == 24283).count),
               "vial_of_powerful_blood": ($materials[0][] | select(.id == 24295).count),
               "vicious_claw": ($materials[0][] | select(.id == 24351).count),
-              "vicious_fang": ($materials[0][] | select(.id == 24357).count),
-              # Add more fields as needed
+              "vicious_fang": ($materials[0][] | select(.id == 24357).count)
             }' > gw2.json
         
       - name: Commit and Push Changes
