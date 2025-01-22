@@ -1,0 +1,80 @@
+name: Fetch GW2 Stats
+
+on:
+  schedule:
+    - cron: '15/3 * * * *' # Runs (15 minutes after) every 3 hours
+  workflow_dispatch:       # Allows manual triggers
+
+jobs:
+  fetch-gw2-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Fetch account data
+      - name: Fetch Account Data
+        uses: JamesIves/fetch-api-data-action@v2
+        with:
+          endpoint: https://api.guildwars2.com/v2/account?&v=2025-01-01T01:00:00.000Z
+          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
+          save-name: account.json
+          
+      # Fetch achievements data
+      - name: Fetch Achievements Data
+        uses: JamesIves/fetch-api-data-action@v2
+        with:
+          endpoint: https://api.guildwars2.com/v2/account/achievements
+          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
+          save-name: achievements.json
+
+      # Fetch wallet data
+      - name: Fetch Wallet Data
+        uses: JamesIves/fetch-api-data-action@v2
+        with:
+          endpoint: https://api.guildwars2.com/v2/account/wallet
+          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
+          save-name: wallet.json
+
+      # Fetch materials data
+      - name: Fetch Materials Data
+        uses: JamesIves/fetch-api-data-action@v2
+        with:
+          endpoint: https://api.guildwars2.com/v2/account/materials
+          configuration: '{ "headers": { "Authorization": "Bearer ${{ secrets.GW2_API_TOKEN }}" } }'
+          save-name: materials.json
+
+          
+      # Process and combine the data
+      - name: Process JSON Data
+        run: |
+          # Create combined stats in a single jq operation
+          jq -n \
+            --slurpfile account account.json \
+            --slurpfile achievements achievements.json \
+            --slurpfile wallet wallet.json \
+            --slurpfile materials materials.json \
+            '{
+              "id": $account[0].id,
+              "wvw_rank": $account[0].wvw.rank,
+              "wvw_kills": ($achievements[0][] | select(.id == 283).current),
+              "coin": ($wallet[0][] | select(.id == 1).value),
+              "mystic_clovers": ($materials[0][] | select(.id == 19675).count),
+              "mystic_coins": ($materials[0][] | select(.id == 19976).count),
+              "ancient_bone": ($materials[0][] | select(.id == 24358).count),
+              "armored_scale": ($materials[0][] | select(.id == 24289).count),
+              "elaborate_totem": ($materials[0][] | select(.id == 24300).count),
+              "pile_of_crystalline_dust": ($materials[0][] | select(.id == 24277).count),
+              "powerful_venom_sac": ($materials[0][] | select(.id == 24283).count),
+              "vial_of_powerful_blood": ($materials[0][] | select(.id == 24295).count),
+              "vicious_claw": ($materials[0][] | select(.id == 24351).count),
+              "vicious_fang": ($materials[0][] | select(.id == 24357).count),
+              # Add more fields as needed
+            }' > gw2.json
+        
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add gw2.json
+          git commit -m "Update GW2 stats" || exit 0
+          git push
