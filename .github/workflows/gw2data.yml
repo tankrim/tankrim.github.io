@@ -2,7 +2,7 @@ name: Fetch GW2 Stats
 
 on:
   schedule:
-    - cron: '7 5-23,0,1 * * *'
+    - cron: '7 11,17,23 * * *'
   workflow_dispatch:       # Allows manual triggers
 
 jobs:
