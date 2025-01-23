@@ -42,12 +42,15 @@ jobs:
       # Process and combine the data
       - name: Process JSON Data
         run: |
+          timestamp=$(date +"%Y-%m-%dT%H:%M:%S%z")
           jq -n \
+            --arg timestamp "$timestamp" \
             --slurpfile account account.json \
             --slurpfile achievements achievements.json \
             --slurpfile wallet wallet.json \
             --slurpfile materials materials.json \
             '{
+              "timestamp": $timestamp,
               "id": $account[0].id,
               "wvw_rank": $account[0].wvw.rank,
               "wvw_kills": ($achievements[0][] | select(.id == 283).current),
