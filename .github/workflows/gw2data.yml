@@ -64,7 +64,8 @@ jobs:
               "powerful_venom_sac": ($materials[0][] | select(.id == 24283).count),
               "vial_of_powerful_blood": ($materials[0][] | select(.id == 24295).count),
               "vicious_claw": ($materials[0][] | select(.id == 24351).count),
-              "vicious_fang": ($materials[0][] | select(.id == 24357).count)
+              "vicious_fang": ($materials[0][] | select(.id == 24357).count),
+              "chunk_of_ancient_ambergris": ($materials[0][] | select(.id == 96347).count)
             }' > gw2.json
         
       - name: Commit and Push Changes
