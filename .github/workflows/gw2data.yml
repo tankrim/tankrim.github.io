@@ -55,6 +55,7 @@ jobs:
               "wvw_rank": $account[0].wvw.rank,
               "wvw_kills": ($achievements[0][] | select(.id == 283).current),
               "coin": ($wallet[0][] | select(.id == 1).value),
+              "research_not": ($wallet[0][] | select(.id == 61).value),
               "mystic_clovers": ($materials[0][] | select(.id == 19675).count),
               "mystic_coins": ($materials[0][] | select(.id == 19976).count),
               "ancient_bone": ($materials[0][] | select(.id == 24358).count),
