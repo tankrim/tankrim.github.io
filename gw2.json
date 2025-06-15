@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-06-15T17:24:00+0000",
+  "timestamp": "2025-06-15T23:24:48+0000",
   "id": "D56685F9-6931-E511-A22A-78E7D1936EF0",
-  "wvw_rank": 6479,
-  "wvw_kills": 75035,
-  "coin": 57990813,
+  "wvw_rank": 6487,
+  "wvw_kills": 75194,
+  "coin": 58032200,
   "research_notes": 99,
   "mystic_clovers": 181,
   "mystic_coins": 619,
@@ -11,9 +11,9 @@
   "armored_scale": 2289,
   "elaborate_totem": 2332,
   "pile_of_crystalline_dust": 330,
-  "powerful_venom_sac": 2399,
+  "powerful_venom_sac": 2400,
   "vial_of_powerful_blood": 2312,
-  "vicious_claw": 2334,
-  "vicious_fang": 2244,
-  "chunk_of_ancient_ambergris": 40
+  "vicious_claw": 2335,
+  "vicious_fang": 2245,
+  "chunk_of_ancient_ambergris": 42
 }
