@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-06-26T11:24:15+0000",
+  "timestamp": "2025-06-26T17:26:30+0000",
   "id": "D56685F9-6931-E511-A22A-78E7D1936EF0",
-  "wvw_rank": 6560,
-  "wvw_kills": 76208,
-  "coin": 35547880,
+  "wvw_rank": 6562,
+  "wvw_kills": 76214,
+  "coin": 35555572,
   "research_notes": 349,
   "mystic_clovers": 194,
   "mystic_coins": 642,
@@ -15,5 +15,5 @@
   "vial_of_powerful_blood": 2333,
   "vicious_claw": 2380,
   "vicious_fang": 2265,
-  "chunk_of_ancient_ambergris": 50
+  "chunk_of_ancient_ambergris": 51
 }
