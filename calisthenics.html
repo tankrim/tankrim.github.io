@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Calisthenics</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── Theme tokens ───────────────────────────────────────────────────────── */
+
+  :root {
+    --radius: 10px;
+  }
+
+  /* Dark theme (default) */
+  [data-theme="dark"] {
+    --bg:           #0e0e0e;
+    --surface:      #1a1a1a;
+    --surface2:     #242424;
+    --border:       #2e2e2e;
+    --accent:       #c8f135;
+    --accent-dim:   #a0c020;
+    --accent-text:  #0e0e0e;
+    --text:         #f0f0f0;
+    --muted:        #666;
+    --disabled-bg:  #151515;
+    --disabled-text:#333;
+    --disabled-border:#1e1e1e;
+    --chevron:      %23c8f135;   /* URL-encoded accent for SVG */
+    --chevron-off:  %23333;
+    --sunday-color: #c0392b;
+  }
+
+  /* Light theme */
+  [data-theme="light"] {
+    --bg:           #f0f2ee;
+    --surface:      #ffffff;
+    --surface2:     #f5f7f2;
+    --border:       #d8ddd0;
+    --accent:       #4a7c1f;
+    --accent-dim:   #3a6218;
+    --accent-text:  #ffffff;
+    --text:         #1a2210;
+    --muted:        #7a8870;
+    --disabled-bg:  #eceee9;
+    --disabled-text:#b0b8a8;
+    --disabled-border:#dde0d8;
+    --chevron:      %234a7c1f;
+    --chevron-off:  %23b0b8a8;
+    --sunday-color: #b83030;
+  }
+
+  /* ── Reset & base ───────────────────────────────────────────────────────── */
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 40px 0;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────────────────── */
+
+  header {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 16px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  /* ── Theme switcher ─────────────────────────────────────────────────────── */
+
+  .theme-switcher {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .theme-btn {
+    background: none;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 7px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .theme-btn[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+
+  /* ── Container ──────────────────────────────────────────────────────────── */
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── Cards ──────────────────────────────────────────────────────────────── */
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .field-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ── Selects ────────────────────────────────────────────────────────────── */
+
+  select {
+    width: 100%;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.95rem;
+    appearance: none;
+    -webkit-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+
+  /* Chevron colour is set inline via JS since CSS vars can't go inside data-URIs */
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  select:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    border-color: var(--disabled-border);
+    cursor: not-allowed;
+  }
+
+  /* ── Exercise cards ─────────────────────────────────────────────────────── */
+
+  .sets-reps-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .exercise-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .exercise-name.disabled { color: var(--disabled-text); }
+
+  .exercise-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .exercise-dot.disabled { background: var(--disabled-text); }
+
+  /* ── Sunday notice ──────────────────────────────────────────────────────── */
+
+  .sunday-notice {
+    text-align: center;
+    padding: 10px 0 4px;
+    font-size: 0.75rem;
+    color: var(--sunday-color);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: none;
+  }
+
+  .sunday-notice.visible { display: block; }
+
+  /* ── Submit button ──────────────────────────────────────────────────────── */
+
+  button#submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button#submit-btn:active {
+    background: var(--accent-dim);
+    transform: scale(0.98);
+  }
+
+  button#submit-btn:disabled {
+    background: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── Toast ──────────────────────────────────────────────────────────────── */
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: var(--accent-text);
+    padding: 10px 22px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Download link ──────────────────────────────────────────────────────── */
+
+  .download-link {
+    display: block;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    transition: color 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+
+  .download-link:hover, .download-link:active {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ── Date row ───────────────────────────────────────────────────────────── */
+
+  .date-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .date-card select { flex: 1; }
+
+  .day-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: rgba(128,180,50, 0.12);
+    border: 1px solid rgba(128,180,50, 0.35);
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .day-badge.sunday {
+    color: var(--sunday-color);
+    background: rgba(192,57,43, 0.1);
+    border-color: rgba(192,57,43, 0.3);
+  }
+
+  /* ── Pre-fill hint ──────────────────────────────────────────────────────── */
+
+  .prefill-hint {
+    font-size: 0.65rem;
+    color: var(--accent-dim);
+    letter-spacing: 0.08em;
+    text-align: right;
+    margin-top: 4px;
+    min-height: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Calisthenics</h1>
+    <div class="theme-switcher" role="group" aria-label="Color theme">
+      <button class="theme-btn" id="theme-btn-light"  aria-pressed="false" title="Light mode">☀️</button>
+      <button class="theme-btn" id="theme-btn-system" aria-pressed="false" title="Follow system">⚙️</button>
+      <button class="theme-btn" id="theme-btn-dark"   aria-pressed="true"  title="Dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Date -->
+  <div class="card">
+    <span class="field-label">Date</span>
+    <div class="date-card">
+      <select id="sel-date" aria-label="Date"></select>
+      <div class="day-badge" id="day-badge">MON</div>
+    </div>
+  </div>
+
+  <div class="sunday-notice" id="sunday-notice">⛔ Rest day — no logging on Sundays</div>
+
+  <!-- Exercise 1: sets + reps -->
+  <div class="card" id="card-exercise1">
+    <div class="exercise-header">
+      <div class="exercise-dot" id="dot-exercise1"></div>
+      <span class="exercise-name" id="name-exercise1">Pushups</span>
+    </div>
+    <div class="sets-reps-row">
+      <div>
+        <span class="field-label">Sets</span>
+        <select id="sel-sets1" aria-label="Sets exercise 1"></select>
+      </div>
+      <div>
+        <span class="field-label">Reps</span>
+        <select id="sel-reps1" aria-label="Reps exercise 1"></select>
+      </div>
+    </div>
+    <div class="prefill-hint" id="hint-exercise1"></div>
+  </div>
+
+  <!-- Exercise 2: sets + reps -->
+  <div class="card" id="card-exercise2">
+    <div class="exercise-header">
+      <div class="exercise-dot" id="dot-exercise2"></div>
+      <span class="exercise-name" id="name-exercise2">Leg Raises</span>
+    </div>
+    <div class="sets-reps-row">
+      <div>
+        <span class="field-label">Sets</span>
+        <select id="sel-sets2" aria-label="Sets exercise 2"></select>
+      </div>
+      <div>
+        <span class="field-label">Reps</span>
+        <select id="sel-reps2" aria-label="Reps exercise 2"></select>
+      </div>
+    </div>
+    <div class="prefill-hint" id="hint-exercise2"></div>
+  </div>
+
+  <button id="submit-btn">Submit</button>
+
+  <a class="download-link" id="download-link">⬇ Download localStorage data</a>
+
+</div>
+
+<div class="toast" id="toast">Saved!</div>
+
+<script>
+  // ── Theme ─────────────────────────────────────────────────────────────────
+
+  const THEME_KEY = 'calisthenics_theme';
+  const htmlEl    = document.documentElement;
+
+  const themeBtns = {
+    light:  document.getElementById('theme-btn-light'),
+    system: document.getElementById('theme-btn-system'),
+    dark:   document.getElementById('theme-btn-dark'),
+  };
+
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function resolveTheme(preference) {
+    if (preference === 'system') return systemDark.matches ? 'dark' : 'light';
+    return preference;
+  }
+
+  function applyTheme(preference) {
+    const resolved = resolveTheme(preference);
+    htmlEl.setAttribute('data-theme', resolved);
+    // Update chevron SVGs on all selects to match accent colour
+    updateSelectChevrons(resolved);
+    // Update button pressed states
+    Object.entries(themeBtns).forEach(([key, btn]) => {
+      btn.setAttribute('aria-pressed', key === preference ? 'true' : 'false');
+    });
+    localStorage.setItem(THEME_KEY, preference);
+  }
+
+  // Chevron SVGs — injected as background-image so they can react to theme
+  const CHEVRONS = {
+    dark: {
+      normal:   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c8f135' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
+      disabled: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23333' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
+    },
+    light: {
+      normal:   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a7c1f' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
+      disabled: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23b0b8a8' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
+    },
+  };
+
+  function updateSelectChevrons(resolvedTheme) {
+    const ch = CHEVRONS[resolvedTheme] || CHEVRONS.dark;
+    // Inject a dynamic style block
+    let styleTag = document.getElementById('dynamic-chevron-style');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'dynamic-chevron-style';
+      document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = `
+      select { background-image: ${ch.normal}; }
+      select:disabled { background-image: ${ch.disabled}; }
+    `;
+  }
+
+  // Listen for OS-level changes when in "system" mode
+  systemDark.addEventListener('change', () => {
+    const pref = localStorage.getItem(THEME_KEY) || 'dark';
+    if (pref === 'system') applyTheme('system');
+  });
+
+  Object.entries(themeBtns).forEach(([key, btn]) => {
+    btn.addEventListener('click', () => applyTheme(key));
+  });
+
+  // Initialise from saved preference (default: dark)
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  function padZ(n) { return String(n).padStart(2, '0'); }
+
+  function toYMD(date) {
+    return `${date.getFullYear()}-${padZ(date.getMonth()+1)}-${padZ(date.getDate())}`;
+  }
+
+  function parseLocal(ymd) {
+    const [y, m, d] = ymd.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+  const EXERCISES = {
+    0: null,
+    1: ['Pushups',   'Leg Raises'],
+    2: ['Pullups',   'Squats'],
+    3: ['Bridges',   'Twists'],
+    4: ['Pushups',   'Leg Raises'],
+    5: ['Pullups',   'Squats'],
+    6: ['Bridges',   'Twists'],
+  };
+
+  const TIMED_EXERCISES = new Set(['Twists']);
+  const STANDARD_REPS   = [5,10,15,20,25,30,35,40,45,50];
+
+  // ── Build date options (±7 days) ─────────────────────────────────────────
+
+  const selDate  = document.getElementById('sel-date');
+  const today    = new Date();
+  today.setHours(0,0,0,0);
+  const todayYMD = toYMD(today);
+
+  for (let i = -7; i <= 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const ymd = toYMD(d);
+    const opt = document.createElement('option');
+    opt.value = ymd;
+    opt.textContent = ymd;
+    if (ymd === todayYMD) opt.selected = true;
+    selDate.appendChild(opt);
+  }
+
+  // ── UI refs ───────────────────────────────────────────────────────────────
+
+  const dayBadge     = document.getElementById('day-badge');
+  const sundayNotice = document.getElementById('sunday-notice');
+  const nameEx1      = document.getElementById('name-exercise1');
+  const nameEx2      = document.getElementById('name-exercise2');
+  const dotEx1       = document.getElementById('dot-exercise1');
+  const dotEx2       = document.getElementById('dot-exercise2');
+  const hintEx1      = document.getElementById('hint-exercise1');
+  const hintEx2      = document.getElementById('hint-exercise2');
+  const selSets1     = document.getElementById('sel-sets1');
+  const selReps1     = document.getElementById('sel-reps1');
+  const selSets2     = document.getElementById('sel-sets2');
+  const selReps2     = document.getElementById('sel-reps2');
+  const submitBtn    = document.getElementById('submit-btn');
+
+  // ── Option builders ───────────────────────────────────────────────────────
+
+  function buildSetsOptions(sel) {
+    sel.innerHTML = '';
+    [2, 3].forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+
+  function buildRepsOptions(sel, exerciseName) {
+    sel.innerHTML = '';
+    if (TIMED_EXERCISES.has(exerciseName)) {
+      const o = document.createElement('option');
+      o.value = '60 seconds'; o.textContent = '60 seconds';
+      sel.appendChild(o);
+    } else {
+      STANDARD_REPS.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        sel.appendChild(o);
+      });
+    }
+  }
+
+  function setSelectValue(sel, val) {
+    const strVal = String(val);
+    const match  = Array.from(sel.options).find(o => o.value === strVal);
+    if (match) sel.value = match.value;
+  }
+
+  // ── Core update ───────────────────────────────────────────────────────────
+
+  function updateUI() {
+    const ymd   = selDate.value;
+    const date  = parseLocal(ymd);
+    const dow   = date.getDay();
+    const isSun = dow === 0;
+
+    dayBadge.textContent = DAY_NAMES[dow];
+    dayBadge.className   = 'day-badge' + (isSun ? ' sunday' : '');
+    sundayNotice.classList.toggle('visible', isSun);
+
+    const exPair = EXERCISES[dow];
+    const ex1 = isSun ? '—' : exPair[0];
+    const ex2 = isSun ? '—' : exPair[1];
+    nameEx1.textContent = ex1;
+    nameEx2.textContent = ex2;
+    nameEx1.className   = 'exercise-name' + (isSun ? ' disabled' : '');
+    nameEx2.className   = 'exercise-name' + (isSun ? ' disabled' : '');
+    dotEx1.className    = 'exercise-dot'  + (isSun ? ' disabled' : '');
+    dotEx2.className    = 'exercise-dot'  + (isSun ? ' disabled' : '');
+
+    buildSetsOptions(selSets1);
+    buildSetsOptions(selSets2);
+    buildRepsOptions(selReps1, isSun ? '' : ex1);
+    buildRepsOptions(selReps2, isSun ? '' : ex2);
+
+    [selSets1, selReps1, selSets2, selReps2].forEach(s => s.disabled = isSun);
+    submitBtn.disabled = isSun;
+
+    hintEx1.textContent = '';
+    hintEx2.textContent = '';
+    if (!isSun) {
+      const storedToday = loadForDate(ymd);
+      // Prefer an entry saved on this exact date; otherwise fall back to the
+      // most recent entry ever logged for that exercise.
+      const e1today = storedToday.find(r => r.exercise === ex1);
+      const e2today = storedToday.find(r => r.exercise === ex2);
+      const e1data  = e1today || lastEntryFor(ex1);
+      const e2data  = e2today || lastEntryFor(ex2);
+      if (e1data) {
+        setSelectValue(selSets1, e1data.sets);
+        setSelectValue(selReps1, e1data.reps);
+        hintEx1.textContent = e1today
+          ? `\u21a9 last saved: ${e1data.sets} \xd7 ${e1data.reps}`
+          : `\u21a9 last session (${e1data.date}): ${e1data.sets} \xd7 ${e1data.reps}`;
+      }
+      if (e2data) {
+        setSelectValue(selSets2, e2data.sets);
+        setSelectValue(selReps2, e2data.reps);
+        hintEx2.textContent = e2today
+          ? `\u21a9 last saved: ${e2data.sets} \xd7 ${e2data.reps}`
+          : `\u21a9 last session (${e2data.date}): ${e2data.sets} \xd7 ${e2data.reps}`;
+      }
+    }
+  }
+
+  // ── localStorage ─────────────────────────────────────────────────────────
+
+  const LS_KEY = 'calisthenics_workout_log';
+
+  function loadAll() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function loadForDate(ymd) {
+    return loadAll().filter(r => r.date === ymd);
+  }
+
+  // Returns the most recent logged entry for a given exercise name, or null.
+  function lastEntryFor(exerciseName) {
+    const all = loadAll().filter(r => r.exercise === exerciseName);
+    if (!all.length) return null;
+    // Entries are appended chronologically; the last one is the most recent.
+    return all[all.length - 1];
+  }
+
+  function saveEntry(ymd, exercise, sets, reps) {
+    const all = loadAll();
+    all.push({ date: ymd, exercise, sets, reps, ts: new Date().toISOString() });
+    localStorage.setItem(LS_KEY, JSON.stringify(all));
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+
+  submitBtn.addEventListener('click', () => {
+    const ymd = selDate.value;
+    const dow = parseLocal(ymd).getDay();
+    if (dow === 0) return;
+
+    const [ex1, ex2] = EXERCISES[dow];
+    saveEntry(ymd, ex1, Number(selSets1.value), selReps1.value);
+    saveEntry(ymd, ex2, Number(selSets2.value), selReps2.value);
+
+    hintEx1.textContent = `↩ last saved: ${selSets1.value} × ${selReps1.value}`;
+    hintEx2.textContent = `↩ last saved: ${selSets2.value} × ${selReps2.value}`;
+
+    showToast(`Saved ${ex1} & ${ex2}`);
+  });
+
+  // ── Download ──────────────────────────────────────────────────────────────
+
+  document.getElementById('download-link').addEventListener('click', e => {
+    e.preventDefault();
+    const data = localStorage.getItem(LS_KEY) || '[]';
+    const blob = new Blob([data], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `calisthenics-log-${todayYMD}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+
+  selDate.addEventListener('change', updateUI);
+  updateUI();
+</script>
+</body>
+</html>
